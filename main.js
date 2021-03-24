@@ -51,7 +51,7 @@ map.on('load', function(){
 	$(".mapboxgl-ctrl-geocoder.mapboxgl-ctrl").append('<div class="map_body2"><div id="map2"  style="height:100%; width:100%; background-color: rgba(2,2,2, 0.1)"></div></div>');
 	
 	// load marker icons
-	map.loadImage("/img/anchor.png", function(err, image) {
+	map.loadImage("img/anchor.png", function(err, image) {
 		if(err) throw err;
 		map.addImage("anchor", image);
 	});
@@ -177,7 +177,7 @@ geocoder.on('result', function(e){
 			// add the marker map marker
 			var elMarker = document.createElement('div');
 			elMarker.classList.add("drop-marker");
-			elMarker.innerHTML = "<img src='/img/anchor.png' alt='' style='height:35px; width:35px;' />";
+			elMarker.innerHTML = "<img src='img/anchor.png' alt='' style='height:35px; width:35px;' />";
 
 			if (lmarker) lmarker.remove();
 

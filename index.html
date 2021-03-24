@@ -1,0 +1,111 @@
+<!DOCTYPE html>
+<html lang="en" dir="ltr">
+ <head>
+    <meta charset="utf-8">
+	<title>World  Map</title>
+	<meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <link rel="stylesheet" href="css/bootstrap.min.css">
+  <link rel="stylesheet" href="css/font-awesome.min.css">
+  <link href="https://api.mapbox.com/mapbox-gl-js/v2.1.1/mapbox-gl.css" rel="stylesheet">
+  <link rel="stylesheet" href="https://api.mapbox.com/mapbox-gl-js/plugins/mapbox-gl-geocoder/v4.7.0/mapbox-gl-geocoder.css" type="text/css">
+  <link rel="preconnect" href="https://fonts.gstatic.com">
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;700&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="css/custom2.css">
+ 
+</head>
+<body>
+	<div class="page_wrapper">
+    	<div class="main_content"><div class="main_wrapper">
+        	<div class="map_main">
+            	<div class="map_header">
+                	<div class="row"><div class="col-2"><button style="cursor:pointer" onClick="$('#modal_map').modal('show')" class="fa fa-map-o"></button></div><div class="col-10" style="overflow:hidden; text-align:left; text-overflow:ellipsis; white-space:nowrap" id="place_header"></div></div>
+                </div>
+                <div class="map_body">
+                	<div id="map_flyover"><a onClick="flyover_map(event)" href=""><img src="img/flyover.png"></a></div>
+                    <div id="map_loc_label"></div>
+                    <div id="map"  style="height:100%; width:100%;"></div>
+                </div>
+                <!-- <div class="map_body2"><div id="map2"  style="height:100%; width:100%; background-color: rgba(2,2,2, 0.1)"></div></div>
+                -->
+                
+            </div>
+        </div></div>
+    
+    
+    </div>
+    
+    
+    <div class="modal" id="modal_map">
+        <div class="modal-dialog modal-lg">
+        <div class="modal-content" style="">
+         <div class="modal-header">
+            <div style="text-align:right"> <button  data-dismiss="modal" type="button" class="close">&times;</button></div>
+            <h4>Map Styles</h4>
+          </div>
+          <!-- Modal body -->
+          <div class="modal-body" style="font-size:14px; margin-top:0px; padding-top:0px;">
+                <div class="table-responsive"><table class="table">
+                	<thead>
+                    	<tr>
+                        	<th></th>
+                            <th>Name</th>
+                            <th>Style Link</th>
+                            <th></th>
+                        </tr>
+                        <tr>
+                        	<th>New</th>
+                            <th><input id="name" class="form-control"></th>
+                            <th><input id="linkn"  class="form-control" placeholder="link"></th>
+                            <th><button id="sbutton" class="btn btn-primary" onClick="add_style(event)">Add</button></th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                    <?php foreach($styles as $style){ ?>
+                    	<tr class="mp_items" data-id="<?php echo $style['id']; ?>" data-link="<?php echo $style['link']; ?>">
+                        	<td style="font-size:16px;"><div id="map_<?php echo $style['id']; ?>" style="width:150px; height:120px;"></div><div><a href="" onClick="show_style(event)">Select</a></div></td>
+                            <td style="font-size:16px;"><a href="" onClick="show_style(event)"><?php echo $style['name']; ?></a></td>
+                            <td><?php echo $style['link']; ?></td>
+                            <td><button class="btn btn-danger btn-sm" onClick="remove_style(event)"> Remove</button></td>
+                        </tr>
+                    <?php } ?>
+                    </tbody>
+                
+                </table></div>
+                 			
+          </div>
+     <!-- Modal footer -->
+          <div class="modal-footer" id="sbutton">   
+            <div class="switch-wrapper">
+
+              <h4 class="text-primary mx-2">Settings</h4>
+
+              <div class="form-check">
+                <input type="checkbox" class="form-check-input" id="flyover-switch" checked>
+                <label class="form-check-label" for="customSwitch1">Flyover</label>
+              </div>
+
+              <div class=" form-check ml-3">
+                <input type="checkbox" class="form-check-input" id="attribution-switch" checked>
+                <label class="form-check-label" for="customSwitch2">Attribution</label>
+              </div>
+
+            </div>
+
+            <button type="button" class="btn btn-default" data-dismiss="modal">Close</button>
+          </div>
+    
+        </div>
+      </div>
+</div>
+
+    
+    <script src="https://api.mapbox.com/mapbox-gl-js/v2.1.1/mapbox-gl.js"></script>
+    <script src="https://api.mapbox.com/mapbox-gl-js/plugins/mapbox-gl-geocoder/v4.7.0/mapbox-gl-geocoder.min.js"></script>
+    <script src='https://unpkg.com/@turf/turf@6.3.0/turf.min.js'></script>
+	  <script src="js/jquery.min.js"></script>
+    <script src="js/bootstrap.min.js"></script>
+	  <script src="main2.js"></script>
+    
+</body>
+</html>

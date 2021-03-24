@@ -3,6 +3,12 @@ var lmarker = null;
 var boundaryLayer = {"type":"FeatureCollection", "features":[]};
 var cur_center = null;
 var cur_zoom = 12.5;
+
+var countryExtent = null;
+var isWorldView = false;
+var resultExtent = null;
+var worldExtent = [[193.4771121291925, 80.03616065583188], [-183.5265838543792, -70.24451767628716]];
+
 var mapSettings = {
 	attribution:false,
 	flyover:false
@@ -37,9 +43,6 @@ var geocoder = new MapboxGeocoder({
 });
 
 geocoder.addTo(map);
-
-// implement a filter function 
-
 
 
 var map2 = null;
@@ -156,7 +159,15 @@ geocoder.on('result', function(e){
    let context = result.context || [];
    console.log(context);
 
+   isWorldView = true;
+   countryExtent = result.bbox;
+
+   //
    if(context[0]) {
+       isWorldView = false;
+       countryExtent = null
+       resultExtent = result.bbox;
+
 	   let contextOne = context[0];
 
 	   console.log(contextOne);
@@ -172,7 +183,7 @@ geocoder.on('result', function(e){
 			}
 
 			// update the 
-			map.getSource('admin-data').setData(boundaryLayer);
+			// map.getSource('admin-data').setData(boundaryLayer);
 
 			// add the marker map marker
 			var elMarker = document.createElement('div');
@@ -183,14 +194,23 @@ geocoder.on('result', function(e){
 
 			lmarker = new mapboxgl.Marker({element:elMarker})
 				.setLngLat(result.center)
-				.addTo(map);
+				// .addTo(map);
 
 			cur_zoom = map.getZoom();
-		});
-			   
+        });
 
-	//    map.setFilter('admin-1-boundary', ['==', ['get', 'name'], ]);
-	  
+
+        let country = context[context.length - 1];
+        let object = {
+            types:"country",
+            name:country.text
+        };  
+     
+       getCountryOrRegionBounds(object);
+   } else {
+        map.once("zoomend", function(e) {
+            cur_zoom = map.getZoom();
+        });
    }
 
    var last_name_lv = '';
@@ -270,23 +290,50 @@ function flyover_map(event){
 	event.preventDefault();
 
 	if(cur_center == null) return;
-		
-	
-	map.flyTo({
-		center: cur_center,
-		zoom: cur_zoom,
-		bearing: 0,
-		speed: 0.8, // make the flying slow
-		curve: 1, // change the speed at which it zooms out
-		easing: function (t) {
-			return t;
-		},
-		essential: true
-	});
-	
+    
+    if(isWorldView) {
+        map.fitBounds(worldExtent);
+    } else {
+        map.fitBounds(countryExtent);
+    }
+
+    setTimeout(function(e) {
+        map.flyTo({
+            center: cur_center,
+            zoom: cur_zoom,
+            bearing: 0,
+            speed: 0.8, // make the flying slow
+            curve: 1, // change the speed at which it zooms out
+            easing: function (t) {
+                return t;
+            },
+            essential: true
+        });
+    }, 3000);
 	
 }
 
+function getCountryOrRegionBounds(object) {
+    let { types, name} = object;
+
+    let REQUEST_URL = "https://api.mapbox.com/geocoding/v5/mapbox.places/" + name +".json?types=" + types + "&access_token=" + mapboxgl.accessToken;
+    
+    fetch(REQUEST_URL)
+    .then(res => res.json())
+    .then(response => {
+        // get the bounding box
+        let country = response.features.find(feature  => feature.id.includes("country"));
+
+        if(country) {
+            countryExtent = country.bbox;
+            console.log(response);
+        }
+        
+    })
+    .catch(error => {
+        console.log(error);
+    });
+}
 
 
 

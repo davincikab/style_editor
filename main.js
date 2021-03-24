@@ -73,7 +73,10 @@ map.on('load', function(){
 			"line-color":"yellow",
 			"line-width":2
 		}
-	});
+    });
+    
+    // remove the filter
+    map.setFilter('admin-1-boundary', null);
 
 	map.on("click", function(e) {
 		let features = map.queryRenderedFeatures({layers:['admin-1-boundary']});
@@ -182,7 +185,10 @@ geocoder.on('result', function(e){
 				boundaryLayer.features.push(bboxPolygon);
 			}
 
-			// update the 
+            // update the 
+            map.setFilter('admin-1-boundary', null);
+            map.setPaintProperty("admin-1-boundary", "line-width", 2);
+            
 			// map.getSource('admin-data').setData(boundaryLayer);
 
 			// add the marker map marker

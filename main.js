@@ -249,7 +249,12 @@ geocoder.on('result', function(e){
 
     var rplace_name_array = rplace_name.split(',');
     last_name_lv = rplace_name_array.slice(-1);
-	rplace_name = rplace_name_array[0] + ", " + rplace_name_array.slice(-1);
+    rplace_name = rplace_name_array[0] + ", " + rplace_name_array.slice(-1);
+    
+    if(rplace_name_array.length == 1) {
+        rplace_name = rplace_name_array[0];
+        last_name_lv = "";
+    }
     
     if(result.place_type.includes("place") && result.place_name.includes("United States")) {
         last_name_lv = rplace_name_array.slice(-2, -1);

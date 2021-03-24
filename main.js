@@ -164,6 +164,7 @@ geocoder.on('result', function(e){
 
    isWorldView = true;
    countryExtent = result.bbox;
+   map.setPaintProperty('admin-1-boundary', 'line-width', 1);
 
    //
    if(context[0]) {
@@ -188,7 +189,7 @@ geocoder.on('result', function(e){
             // update the 
             map.setFilter('admin-1-boundary', null);
             map.setPaintProperty("admin-1-boundary", "line-width", 2);
-            
+
 			// map.getSource('admin-data').setData(boundaryLayer);
 
 			// add the marker map marker
@@ -246,9 +247,16 @@ geocoder.on('result', function(e){
 		last_name_lv = '';
 	}
 
-	var rplace_name_array = rplace_name.split(',');
-	last_name_lv = rplace_name_array.slice(-1);
+    var rplace_name_array = rplace_name.split(',');
+    last_name_lv = rplace_name_array.slice(-1);
 	rplace_name = rplace_name_array[0] + ", " + rplace_name_array.slice(-1);
+    
+    if(result.place_type.includes("place") && result.place_name.includes("United States")) {
+        last_name_lv = rplace_name_array.slice(-2, -1);
+	    rplace_name = rplace_name_array[0] + ", " + rplace_name_array.slice(-2, -1);
+    }
+
+	
 
    $("#place_header").html('<span>'+rplace_name+' &nbsp; &nbsp; at &nbsp; &nbsp;</span> <i>' + result.center[0] + ', '+ result.center[1] + '</i>');
   

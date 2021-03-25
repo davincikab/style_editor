@@ -596,6 +596,11 @@ function fetchMiamiBoundary() {
 		// update the boudary layer
 		boundaryLayer = response;
 		map.getSource('admin-data').setData(boundaryLayer);
+
+		let bbox = turf.bbox(boundaryLayer);
+		map.fitBounds(bbox, {
+			padding:{top: 40, bottom:40, left: 40, right: 40}
+		});
 	})
 	.catch(error => {
 		console.error(error);

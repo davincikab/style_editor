@@ -7,6 +7,7 @@ var cur_zoom = 12.5;
 var countryExtent = null;
 var isWorldView = false;
 var resultExtent = null;
+var overpassResponse = null;
 var worldExtent = [[193.4771121291925, 80.03616065583188], [-183.5265838543792, -70.24451767628716]];
 
 var mapSettings = {
@@ -206,7 +207,6 @@ geocoder.on('result', function(e){
 			cur_zoom = map.getZoom();
         });
 
-
         let country = context[context.length - 1];
         let object = {
             types:"country",
@@ -214,7 +214,7 @@ geocoder.on('result', function(e){
         };  
      
 	   getCountryOrRegionBounds(object);
-	   queryOverpassAPI(contextOne.text, country.text);
+	   queryOverpassAPI(result.text, country.text);
 
    } else {
         map.once("zoomend", function(e) {
@@ -403,24 +403,20 @@ function add_style(event){
 				});		
 						
 						
-				
-				
 			}
 			else{
 			  alert(data)	;
 				
 			}
-			 
 	 }
 	});	
-	
 }
 
-
 function  remove_style(event){
-	
 	event.preventDefault();
+
 	var conf = confirm('Do you want to delete this Style?');
+
 	if(!conf) return;
 	
 	var parent = $(event.target).closest('tr');
@@ -448,7 +444,6 @@ function  remove_style(event){
 	 }
 	});	
 	
-	
 }
 
 function show_style(event){
@@ -463,10 +458,7 @@ function show_style(event){
 	
 	$("#modal_map").modal('hide');
 	
-
 }
-
-
 
 
 $(document).ready(function(){
@@ -479,10 +471,8 @@ $(document).ready(function(){
             style: $(this).data('link'),
 			center: [-74.5, 40],
 		});
-
-	   
+   
 	});	
-	
 	
 });
 
@@ -492,7 +482,6 @@ function get_map_bounds(bbx){
 	var lat_min = bbx[2];
 	var lon_max = bbx[1];
 	var lon_min =  bbx[3];
-
 	
 	var lat_diff_fact = (lat_max - lat_min) / 2;
 	lat_max  += lat_diff_fact;
@@ -538,7 +527,7 @@ $("#attribution-switch").on("input", function(e) {
 function queryOverpassAPI(place_name, country) {
 	let query = "[out:json];" +
 	"area['admin_level'='2']['name'='" + country + "'];" +
-	"(relation[name='" + place_name +"'][type=boundary](area););" +
+	"(relation[name='" + place_name +"'][border_type=city][type=boundary](area););" +
 	"out geom;";
 
 	console.log(query);
@@ -550,6 +539,35 @@ function queryOverpassAPI(place_name, country) {
 		crossDomain: true,
 		success:function(response) {
 			console.log(response);
+			overpassResponse = response;
+			let elements = response.elements;
+
+			if(elements[0]) {
+				let responseElement = elements[0];
+
+				if(responseElement) {
+					// get coordinates 
+					let member = responseElement.members[0];
+
+					if(member) {
+						// get geometry 
+						let geometry = member.geometry;
+
+						// create [] of lng, lat
+						geometry = geometry.map(coord => [ coord.lon, coord.lat]);
+
+						// update the boundary layer
+						let polygon = turf.polygon(geometry);
+
+						// update boundary layer
+						boundaryLayer.features.push(polygon);
+						map.getSource('admin-data').setData(boundaryLayer);
+
+					}
+
+				}
+			}
+
 		},
 		error:function(error) {
 			console.log(error.responseText);

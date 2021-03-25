@@ -188,7 +188,7 @@ geocoder.on('result', function(e){
 
             // update the 
             map.setFilter('admin-1-boundary', null);
-            map.setPaintProperty("admin-1-boundary", "line-width", 2);
+            map.setPaintProperty("admin-1-boundary", "line-width", 2.5);
 
 			// map.getSource('admin-data').setData(boundaryLayer);
 
@@ -213,7 +213,9 @@ geocoder.on('result', function(e){
             name:country.text
         };  
      
-       getCountryOrRegionBounds(object);
+	   getCountryOrRegionBounds(object);
+	   queryOverpassAPI(contextOne.text, country.text);
+
    } else {
         map.once("zoomend", function(e) {
             cur_zoom = map.getZoom();
@@ -269,8 +271,15 @@ geocoder.on('result', function(e){
   // create a HTML element for each feature
   var elm = document.createElement('div');
   elm.className = 'lmarker';
-  var content = '<a href="#"><div><div class="pl_main">' + place_name + '</div>'+ more_loc +'<div class="pl_main_ln"></div><div class="pl_main_sub">' + last_name_lv + '</div></div></a>'; 
-  elm.innerHTML = content;
+  var content;
+  
+    if(last_name_lv) {
+        content = '<a href="#"><div><div class="pl_main">' + place_name + '</div>'+ more_loc +'<div class="pl_main_ln"></div><div class="pl_main_sub">' + last_name_lv + '</div></div></a>'; 
+    } else {
+        content = '<a href="#"><div><div class="pl_main">' + place_name + '</div>'+ more_loc +'</div></a>'; 
+    }
+
+    elm.innerHTML = content;
   
   document.getElementById('map_loc_label').innerHTML = '';
   document.getElementById('map_loc_label').appendChild(elm);
@@ -525,3 +534,46 @@ $("#attribution-switch").on("input", function(e) {
 	}
 
 });
+
+function queryOverpassAPI(place_name, country) {
+	let query = "[out:json];" +
+	"area['admin_level'='2']['name'='" + country + "'];" +
+	"(relation[name='" + place_name +"'][type=boundary](area););" +
+	"out geom;";
+
+	console.log(query);
+	$.ajax({
+		url:'https://www.overpass-api.de/api/interpreter?data=' + query,
+		dataType:'json',
+		type: 'GET',
+		async: true,
+		crossDomain: true,
+		success:function(response) {
+			console.log(response);
+		},
+		error:function(error) {
+			console.log(error.responseText);
+		}
+	})
+}
+
+// let url = "[out:json];" +
+// "area['admin_level'='2']['name'='" + country + "'];" +
+// "(relation[name='" + place +"'][type=boundary](area););" +
+// "out geom;";
+
+// let 
+
+// get points
+// 'https://www.overpass-api.de/api/interpreter?data=' + 
+// 			'[out:json][timeout:60];' + 
+// 			'area["boundary"~"administrative"]["name"~"Berlin"];' + 
+// 			'node(area)["amenity"~"school"];' + 
+// 			'out;',
+// relation query
+// rel[type=boundary]
+//   [name="Miami"]
+//   [boundary=administrative];
+// out geom;
+
+// way query

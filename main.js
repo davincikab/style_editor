@@ -67,11 +67,21 @@ map.on('load', function(){
 	});
 
 	map.addLayer({
+		"id":'admin-data-poly',
+		"source":"admin-data",
+		"type":"fill",
+		"paint":{
+			"fill-color":"#ddd",
+			"fill-opacity":0.6
+		}
+	});
+	
+	map.addLayer({
 		"id":'admin-data',
 		"source":"admin-data",
 		"type":"line",
 		"paint":{
-			"line-color":"yellow",
+			"line-color":"#f96461",
 			"line-width":2
 		}
     });
@@ -205,6 +215,8 @@ geocoder.on('result', function(e){
 				// .addTo(map);
 
 			cur_zoom = map.getZoom();
+
+			if(result.text == "Miami") { fetchMiamiBoundary(); }
         });
 
         let country = context[context.length - 1];
@@ -214,7 +226,7 @@ geocoder.on('result', function(e){
         };  
      
 	   getCountryOrRegionBounds(object);
-	   queryOverpassAPI(result.text, country.text);
+	//  queryOverpassAPI(result.text, country.text);
 
    } else {
         map.once("zoomend", function(e) {
@@ -552,7 +564,6 @@ function queryOverpassAPI(place_name, country) {
 					if(member) {
 						// get geometry 
 						let geometry = member.geometry;
-
 						// create [] of lng, lat
 						geometry = geometry.map(coord => [ coord.lon, coord.lat]);
 
@@ -575,6 +586,23 @@ function queryOverpassAPI(place_name, country) {
 	})
 }
 
+
+function fetchMiamiBoundary() {
+	fetch("miami.geojson")
+	.then(res => res.json())
+	.then(response => {	
+		console.log(response);
+
+		// update the boudary layer
+		boundaryLayer = response;
+		map.getSource('admin-data').setData(boundaryLayer);
+	})
+	.catch(error => {
+		console.error(error);
+	});
+}
+// [-93.221669, 39.331326]
+// [-93.221669, 39.331326]
 // let url = "[out:json];" +
 // "area['admin_level'='2']['name'='" + country + "'];" +
 // "(relation[name='" + place +"'][type=boundary](area););" +

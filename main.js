@@ -21,7 +21,7 @@ mapboxgl.accessToken = 'pk.eyJ1IjoiZnV0dXJlcXVlc3QiLCJhIjoiY2tsOXF5YjBpMXBuMzJwc
 let map = new mapboxgl.Map({
     container: 'map',
     zoom: 12.48236,
-    style: 'mapbox://styles/futurequest/ckm5cxhg8dygi17qnrwoa67bw',
+	style: 'mapbox://styles/futurequest/ckm5cxhg8dygi17qnrwoa67bw',
 	center: [-74.5, 40],
 	attributionControl:false
 });
@@ -82,7 +82,7 @@ map.on('load', function(){
 		"type":"line",
 		"paint":{
 			"line-color":"#f96461",
-			"line-width":2
+			"line-width":3
 		}
     });
     
